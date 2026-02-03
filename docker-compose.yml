@@ -36,7 +36,7 @@ services:
       - XRAY_ASSETS_PATH=${XRAY_ASSETS_PATH:-/usr/local/share/xray}
       - GENERATED_CONFIG_PATH=/var/lib/pg-node/generated
     volumes:
-      - ./data/pg-node:/var/lib/pg-node
+      - /var/lib/pg-node:/var/lib/pg-node
     depends_on:
       - tailscale
     restart: unless-stopped
