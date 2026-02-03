@@ -1,6 +1,6 @@
 services:
   tailscale:
-    image: tailscale/tailscale:latest
+    image: tailscale/tailscale:stable
     hostname: tail-x-node
     container_name: tailscale
     environment:
