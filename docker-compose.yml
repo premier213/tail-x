@@ -13,6 +13,7 @@ services:
     ports:
       - "${SERVICE_PORT:-62050}:${SERVICE_PORT:-62050}"
       - "${API_PORT:-62051}:${API_PORT:-62051}"
+      - "${VLESS_PORT:-1080}:1080"
     devices:
       - /dev/net/tun:/dev/net/tun
     cap_add:
