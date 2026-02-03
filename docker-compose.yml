@@ -1,0 +1,45 @@
+services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    hostname: tail-x-node
+    container_name: tailscale
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+      - TS_EXTRA_ARGS=--advertise-exit-node --accept-routes
+    volumes:
+      - tailscale-state:/var/lib/tailscale
+    ports:
+      - "${SERVICE_PORT:-62050}:${SERVICE_PORT:-62050}"
+      - "${API_PORT:-62051}:${API_PORT:-62051}"
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+    restart: unless-stopped
+
+  pasarguard:
+    image: pasarguard/node:latest
+    container_name: pasarguard-node
+    network_mode: service:tailscale
+    environment:
+      - API_KEY=${API_KEY}
+      - NODE_HOST=${NODE_HOST:-0.0.0.0}
+      - SERVICE_PORT=${SERVICE_PORT:-62050}
+      - API_PORT=${API_PORT:-62051}
+      - SERVICE_PROTOCOL=${SERVICE_PROTOCOL:-grpc}
+      - DEBUG=${DEBUG:-false}
+      - SSL_CERT_FILE=/var/lib/pg-node/certs/ssl_cert.pem
+      - SSL_KEY_FILE=/var/lib/pg-node/certs/ssl_key.pem
+      - XRAY_EXECUTABLE_PATH=${XRAY_EXECUTABLE_PATH:-/usr/local/bin/xray}
+      - XRAY_ASSETS_PATH=${XRAY_ASSETS_PATH:-/usr/local/share/xray}
+      - GENERATED_CONFIG_PATH=/var/lib/pg-node/generated
+    volumes:
+      - ./data/pg-node:/var/lib/pg-node
+    depends_on:
+      - tailscale
+    restart: unless-stopped
+
+volumes:
+  tailscale-state:
